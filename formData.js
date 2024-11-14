@@ -6,7 +6,14 @@ function FormData(){
   let files = [];
 
   this.append = (name, value)=>{
-    data[name] = value;
+    if (data[name]) {
+      if (!Array.isArray(data[name])) {
+        data[name] = [data[name]];
+      }
+      data[name].push(value);
+    } else {
+      data[name] = value;
+    }
     return true;
   }
 
@@ -73,6 +80,20 @@ function randString() {
 }
 
 function formDataArray(boundary, name, value, fileName){
+  let dataArray = [];
+
+  // 处理数组类型的值
+  if (Array.isArray(value)) {
+    value.forEach(item => {
+      dataArray = dataArray.concat(createFormDataItem(boundary, name, item, fileName));
+    });
+    return dataArray;
+  }
+
+  return createFormDataItem(boundary, name, value, fileName);
+}
+
+function createFormDataItem(boundary, name, value, fileName) {
   let dataString = '';
   let isFile = !!fileName;
 
@@ -146,4 +167,3 @@ String.prototype.utf8CodeAt = function(i) {
 
 
 module.exports = FormData;
-
